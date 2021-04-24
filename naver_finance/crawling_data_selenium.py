@@ -1,6 +1,7 @@
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import time
+import pandas as pd
 
 #chromedriver의 위치지정
 driver = webdriver.Chrome('/Users/mijeong/Downloads/chromedriver')
@@ -31,10 +32,10 @@ def print_stock_price(code):
                 result[5].append(tr[i].select('td')[6].text.strip().replace(",",""))
         n+=1
         time.sleep(2)#크롤링 시간지연주기
-        if n==3:#테스트를 위한 페이지수
-            break
-        #if n==pagenum: #마지막페이지면 break
-           #break
+        #if n==3:#테스트를 위한 페이지수
+            #break
+        if n==pagenum: #마지막페이지면 break
+           break
 
 
     col.append(tr[0].select('th')[0].text.strip())#항목명 구함
@@ -43,16 +44,33 @@ def print_stock_price(code):
     col.append(tr[0].select('th')[4].text.strip())
     col.append(tr[0].select('th')[5].text.strip())
     col.append(tr[0].select('th')[6].text.strip())
-    for i in range(6):
+
+    #terminal print
+    '''for i in range(6):
         if i==5:
             print(col[i],end="\n")
             break
-        print(col[i],end=" ")
+        print(col[i],end=" ")'''
 
-    for i in range(len(result[0])):
-        print(result[0][i], result[1][i], result[2][i],result[3][i],result[4][i],result[5][i])
+    '''for i in range(len(result[0])):
+        print(result[0][i], result[1][i], result[2][i],result[3][i],result[4][i],result[5][i])'''
 
-stock_code = '016380'
+    #csv파일로 출력
+    df = pd.DataFrame(
+        {
+            '날짜':result[0],
+            '시가':result[2],
+            '고가':result[3],
+            '저가':result[4],
+            '종가':result[1],
+            '거래량':result[5]
+        }
+    )
+    df.set_index('날짜', inplace=True)
+    df.to_csv("./삼성전자.csv")
+
+
+stock_code = '005930'#중목코드
 
 print_stock_price(stock_code)
 
